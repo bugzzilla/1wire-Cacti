@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 /usr/local/bin/socat -d -d -d -lf /var/log/socat/socat.log PTY,link=/dev/vport0,raw,b9600,echo=0 tcp:172.23.81.35:3999 < /dev/null &
 sleep 3
@@ -14,8 +14,6 @@ for f in `ls /mnt/1wire/|grep 28.`;
                 cat /mnt/1wire/${f}/temperature;
                 echo;
         done
-
-
 
 pkill -f /opt/owfs/bin/owfs
 pkill -f /usr/local/bin/socat
