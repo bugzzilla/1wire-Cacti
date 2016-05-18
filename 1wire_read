@@ -16,10 +16,10 @@ $owfs -d $socat_virtual_port -m $owfs_mount_point --allow_other --error_level 9 
 
 echo "Sensor:Temperature";
 
-for f in `ls /mnt/1wire/|grep 28.`;
+for f in `ls $owfs_mount_point/|grep 28.`;
         do
                 echo -n "${f}:";
-                cat /mnt/1wire/${f}/temperature;
+                cat $owfs_mount_point/${f}/temperature;
                 echo ;
         done
 
