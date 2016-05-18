@@ -1,16 +1,16 @@
 #! /bin/bash
 
-wire2eth="172.23.81.35:3999"
-mountpoint="/mnt/1wire"
-virtualport="/dev/vport0"
+wire2eth_controller="172.23.81.35:3999"
+owfs_mount_point="/mnt/1wire"
+socat_virtual_port="/dev/vport0"
 
-/usr/local/bin/socat -d -d -d -ly PTY,link=$virtualport,raw,b9600,echo=0 tcp:$wire2eth < /dev/null &
+/usr/local/bin/socat -d -d -d -ly PTY,link=$socat_virtual_port,raw,b9600,echo=0 tcp:$wire2eth_controller < /dev/null &
 sleep 3
-echo -n -e "\xC1\xE3\xC5" > $virtualport
-echo -n -e "\xA1" > $virtualport
-echo -n -e "\xC5" > $virtualport
-echo -n -e "\x17\x45\x5B\x0F\x91" > $virtualport
-/opt/owfs/bin/owfs -d $virtualport -m $mountpoint --allow_other --error_level 9 --error_print 0
+echo -n -e "\xC1\xE3\xC5" > $socat_virtual_port
+echo -n -e "\xA1" > $socat_virtual_port
+echo -n -e "\xC5" > $socat_virtual_port
+echo -n -e "\x17\x45\x5B\x0F\x91" > $socat_virtual_port
+/opt/owfs/bin/owfs -d $socat_virtual_port -m $owfs_mount_point --allow_other --error_level 9 --error_print 0
 
 echo "Sensor:Temperature";
 
