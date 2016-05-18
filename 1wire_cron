@@ -1,11 +1,11 @@
 #!/bin/bash
 
-wire_read=/bin/1wire_read
-storage_path=/var/wire2eth
-storage=temperature
+WIRE_READ=/bin/1wire_read
+STORAGE_PATH=/var/wire2eth
+STORAGE=temperature
 
-if ! [ -d $storage_path ]; then
-        mkdir $storage_path;
+if ! [ -d $STORAGE_PATH ]; then
+        mkdir $STORAGE_PATH;
 fi
 
-$wire_read > $storage_path/$storage.tmp && mv $storage_path/$storage.tmp $storage_path/$storage
+$WIRE_READ > $STORAGE_PATH/$STORAGE.tmp && mv $STORAGE_PATH/$STORAGE.tmp $STORAGE_PATH/$STORAGE
