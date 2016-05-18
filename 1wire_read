@@ -1,27 +1,32 @@
 #! /bin/bash
 
-owfs="/opt/owfs/bin/owfs"
-socat="/usr/local/bin/socat"
-wire2eth_controller="172.23.81.35:3999"
-owfs_mount_point="/mnt/1wire"
-socat_virtual_port="/dev/vport0"
-
-$socat -d -d -d -ly PTY,link=$socat_virtual_port,raw,b9600,echo=0 tcp:$wire2eth_controller < /dev/null &
-sleep 3
-echo -n -e "\xC1\xE3\xC5" > $socat_virtual_port
-echo -n -e "\xA1" > $socat_virtual_port
-echo -n -e "\xC5" > $socat_virtual_port
-echo -n -e "\x17\x45\x5B\x0F\x91" > $socat_virtual_port
-$owfs -d $socat_virtual_port -m $owfs_mount_point --allow_other --error_level 9 --error_print 0
+OWFS="/opt/owfs/bin/owfs"
+SOCAT="/usr/local/bin/socat"
+CONTROLLER="172.23.81.35:3999"
+MOUNT_POINT="/mnt/1wire"
+VIRTUAL_PORT="/dev/vport0"
+PING_COUNT=1
 
 echo "Sensor:Temperature";
 
-for f in `ls $owfs_mount_point/|grep 28.`;
-        do
-                echo -n "${f}:";
-                cat $owfs_mount_point/${f}/temperature;
-                echo ;
-        done
+if [ $(ping -c $PING_COUNT $(echo $CONTROLLER | awk -F':' '{print $1}') | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }') -ne 0 ]; then
 
-pkill -f $owfs > /dev/null
-pkill -f $socat > /dev/null
+        $SOCAT -d -d -d -ly PTY,link=$VIRTUAL_PORT,raw,b9600,echo=0 tcp:$CONTROLLER < /dev/null &
+        sleep 1
+        echo -n -e "\xC1\xE3\xC5" > $VIRTUAL_PORT
+        echo -n -e "\xA1" > $VIRTUAL_PORT
+        echo -n -e "\xC5" > $VIRTUAL_PORT
+        echo -n -e "\x17\x45\x5B\x0F\x91" > $VIRTUAL_PORT
+        $OWFS -d $VIRTUAL_PORT -m $MOUNT_POINT --allow_other --error_level 9 --error_print 0
+
+        for f in `ls $MOUNT_POINT/|grep 28.`;
+                do
+                        echo -n "${f}:";
+                        cat $MOUNT_POINT/${f}/temperature;
+                        echo ;
+                done
+
+        pkill -f $OWFS > /dev/null
+        pkill -f $SOCAT > /dev/null
+
+fi
