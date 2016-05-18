@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 /usr/local/bin/socat -d -d -d -ly PTY,link=/dev/vport0,raw,b9600,echo=0 tcp:172.23.81.35:3999 < /dev/null &
 sleep 3
