@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /bin/sh
 
-/usr/local/bin/socat -d -d -d -lf /var/log/socat/socat.log PTY,link=/dev/vport0,raw,b9600,echo=0 tcp:172.23.81.35:3999 < /dev/null &
+/usr/local/bin/socat -d -d -d -ly PTY,link=/dev/vport0,raw,b9600,echo=0 tcp:172.23.81.35:3999 < /dev/null &
 sleep 3
 echo -n -e "\xC1\xE3\xC5" > /dev/vport0
 echo -n -e "\xA1" > /dev/vport0
@@ -8,12 +8,15 @@ echo -n -e "\xC5" > /dev/vport0
 echo -n -e "\x17\x45\x5B\x0F\x91" > /dev/vport0
 /opt/owfs/bin/owfs -d /dev/vport0 -m /mnt/1wire --allow_other --error_level 9 --error_print 0
 
+echo "Sensor:Temperature";
+
 for f in `ls /mnt/1wire/|grep 28.`;
         do
-                echo -n "${f} : ";
+                echo -n "${f}:";
                 cat /mnt/1wire/${f}/temperature;
-                echo;
+                echo ;
         done
 
-pkill -f /opt/owfs/bin/owfs
-pkill -f /usr/local/bin/socat
+pkill -f /opt/owfs/bin/owfs > /dev/null
+pkill -f /usr/local/bin/socat > /dev/null
+
