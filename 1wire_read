@@ -7,26 +7,28 @@ MOUNT_POINT="/mnt/1wire"
 VIRTUAL_PORT="/dev/vport0"
 PING_COUNT=1
 
-echo "Sensor:Temperature";
-
 if [ $(ping -c $PING_COUNT $(echo $CONTROLLER | awk -F':' '{print $1}') | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }') -ne 0 ]; then
 
-        $SOCAT -d -d -d -ly PTY,link=$VIRTUAL_PORT,raw,b9600,echo=0 tcp:$CONTROLLER < /dev/null &
+        logger -i Host $CONTROLLER online
+
+        $SOCAT -d -d -ly PTY,link=$VIRTUAL_PORT,raw,b9600,echo=0 tcp:$CONTROLLER < /dev/null &
         sleep 1
         echo -n -e "\xC1\xE3\xC5" > $VIRTUAL_PORT
         echo -n -e "\xA1" > $VIRTUAL_PORT
         echo -n -e "\xC5" > $VIRTUAL_PORT
         echo -n -e "\x17\x45\x5B\x0F\x91" > $VIRTUAL_PORT
-        $OWFS -d $VIRTUAL_PORT -m $MOUNT_POINT --allow_other --error_level 9 --error_print 0
+        $OWFS -d $VIRTUAL_PORT -m $MOUNT_POINT --allow_other --error_print 1
 
         for f in `ls $MOUNT_POINT/|grep 28.`;
                 do
-                        echo -n "${f}:";
-                        cat $MOUNT_POINT/${f}/temperature;
-                        echo ;
+                        ST=$(echo -n "${f}:" && cat $MOUNT_POINT/${f}/temperature && echo);
+                        echo $ST;
+                        logger -i $ST;
                 done
 
         pkill -f $OWFS > /dev/null
         pkill -f $SOCAT > /dev/null
 
+else
+        logger -i Host $CONTROLLER is down
 fi
