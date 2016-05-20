@@ -7,7 +7,7 @@ MOUNT_POINT="/mnt/1wire"
 VIRTUAL_PORT="/dev/vport0"
 PING_COUNT=1
 
-if [ $(ping -c $PING_COUNT $(echo $CONTROLLER | awk -F':' '{print $1}') | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }') -ne 0 ]; then
+if [ $(ping -c $PING_COUNT $(echo $CONTROLLER | cut -f 1 -d :) | grep 'received' | cut -f 2 -d , | cut -f 2 -d  ' ') -ne 0 ]; then
 
         logger -i Host $CONTROLLER online
 
